@@ -70,7 +70,7 @@ async def load_it_info(message: types.Message, state: FSMContext) -> None:
 
 
 
-@dp.message_handler(content_types=[*types.ContentTypes.TEXT, *types.ContentTypes.PHOTO], state=ProfileStatesGroup.passport1)
+@dp.message_handler(content_types=['photo'], state=ProfileStatesGroup.passport1)
 async def load_it_info(message: types.Message, state: FSMContext) -> None:
     if message.text == "🔙":
         await bot.send_message(chat_id=message.from_user.id,
@@ -87,7 +87,7 @@ async def load_it_info(message: types.Message, state: FSMContext) -> None:
 
 
 
-@dp.message_handler(content_types=[*types.ContentTypes.TEXT, *types.ContentTypes.PHOTO], state=ProfileStatesGroup.zagran)
+@dp.message_handler(content_types=['photo'], state=ProfileStatesGroup.zagran)
 async def load_it_info(message: types.Message, state: FSMContext) -> None:
     if message.text == "🔙":
         async with state.proxy() as data:
@@ -113,7 +113,7 @@ async def load_it_info(message: types.Message, state: FSMContext) -> None:
         await ProfileStatesGroup.photo.set()
 
 
-@dp.message_handler(content_types=[*types.ContentTypes.TEXT, *types.ContentTypes.PHOTO], state=ProfileStatesGroup.photo)
+@dp.message_handler(content_types=['photo'], state=ProfileStatesGroup.photo)
 async def load_it_info(message: types.Message, state: FSMContext) -> None:
     if message.text == "🔙":
         async with state.proxy() as data:
