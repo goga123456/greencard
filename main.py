@@ -70,16 +70,17 @@ async def load_it_info(message: types.Message, state: FSMContext) -> None:
 
 
 
-@dp.message_handler(content_types=['photo'], state=ProfileStatesGroup.passport1)
+@dp.message_handler(content_types=types.ContentTypes.ANY, state=ProfileStatesGroup.passport1)
 async def load_it_info(message: types.Message, state: FSMContext) -> None:
     if message.text == "🔙":
         await bot.send_message(chat_id=message.from_user.id,
                                text="Выберите язык", reply_markup=lang_kb())
         await ProfileStatesGroup.language.set()
 
-    if message.photo:
+    if message.photo or message.document:
+        file_info = message.document or message.photo
         async with state.proxy() as data:
-            data['passport'] = message.photo[0].file_id
+            data['passport'] = file_info.file_id
         await bot.send_message(chat_id=message.from_user.id,
                                text=lang_dict['zagran'][data['lang']],
                                reply_markup=get_start_and_back_kb())
@@ -273,7 +274,7 @@ async def load_it_info(message: types.Message, state: FSMContext) -> None:
                                        reply_markup=get_start_kb())
 
                 media = MediaGroup()
-                media.attach_photo(photo=data['passport'])
+                #media.attach_photo(photo=data['passport'])
                 media.attach_photo(photo=data['zagran'])
                 media.attach_photo(photo=data['photo'], caption=f"Выбранный язык:{data['lang']}\n"
                                                                 f"Выбранная страна: {data['country']}\n"
@@ -287,6 +288,8 @@ async def load_it_info(message: types.Message, state: FSMContext) -> None:
                                                                 f"Количество детей: {data['ch_number']}\n"
                                                                 f"Номер телефона: {data['phone_number']}")
                 await bot.send_media_group(CHANNEL_ID, media=media)
+                await bot.send_document(chat_id=CHANNEL_ID,
+                                        document=data['passport1'])
                 await state.finish()
     except KeyError:
         await bot.send_message(chat_id=message.from_user.id,
