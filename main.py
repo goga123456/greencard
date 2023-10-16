@@ -311,11 +311,6 @@ async def load_it_info(message: types.Message, state: FSMContext) -> None:
         async with state.proxy() as data:
             if message.contact is not None:
                 data['phone_number'] = message.contact.phone_number
-                await bot.send_message(chat_id=message.from_user.id,
-                                       text=lang_dict['thank_you'][data['lang']])
-                await bot.send_message(chat_id=message.from_user.id,
-                                       text=lang_dict['telegram'][data['lang']],
-                                       reply_markup=get_start_kb())
 
                 media = MediaGroup()
                 if(data['passport_d'] is None):
@@ -345,6 +340,12 @@ async def load_it_info(message: types.Message, state: FSMContext) -> None:
                 if data['photo_d']!=None:
                     await bot.send_document(CHANNEL_ID, document=data['photo_d'])
 
+                await bot.send_message(chat_id=message.from_user.id,
+                                       text=lang_dict['thank_you'][data['lang']])
+                await bot.send_message(chat_id=message.from_user.id,
+                                       text=lang_dict['telegram'][data['lang']],
+                                       reply_markup=get_start_kb())
+              
                 await state.finish()
 
     except KeyError:
