@@ -122,8 +122,8 @@ async def load_it_info(message: types.Message, state: FSMContext) -> None:
         await ProfileStatesGroup.photo.set()
     if message.document:
         async with state.proxy() as data:
-            data['zagran_d'] = None
-            data['zagran'] = message.document.file_id
+            data['zagran_d'] = message.document.file_id
+            data['zagran'] = None
         await bot.send_message(chat_id=message.from_user.id,
                                text=lang_dict['photo'][data['lang']],
                                reply_markup=get_start_and_back_kb())
