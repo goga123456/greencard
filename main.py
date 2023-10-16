@@ -70,7 +70,7 @@ async def load_it_info(message: types.Message, state: FSMContext) -> None:
 
 
 
-@dp.message_handler(content_types=[*types.ContentTypes.TEXT, *types.ContentTypes.PHOTO], state=ProfileStatesGroup.passport1)
+@dp.message_handler(content_types=[*types.ContentTypes.ANY, *types.ContentTypes.TEXT], state=ProfileStatesGroup.passport1)
 async def load_it_info(message: types.Message, state: FSMContext) -> None:
     if message.text == "🔙":
         await bot.send_message(chat_id=message.from_user.id,
@@ -80,14 +80,22 @@ async def load_it_info(message: types.Message, state: FSMContext) -> None:
     if message.photo:
         async with state.proxy() as data:
             data['passport'] = message.photo[0].file_id
+            data['passport_d'] = None
         await bot.send_message(chat_id=message.from_user.id,
                                text=lang_dict['zagran'][data['lang']],
                                reply_markup=get_start_and_back_kb())
         await ProfileStatesGroup.zagran.set()
 
+    if message.document:
+        async with state.proxy() as data:
+            data['passport_d'] = message.document.file_id
+            data['passport'] = None
+        await bot.send_message(chat_id=message.from_user.id,
+                               text=lang_dict['zagran'][data['lang']],
+                               reply_markup=get_start_and_back_kb())
+        await ProfileStatesGroup.zagran.set()
 
-
-@dp.message_handler(content_types=['photo'], state=ProfileStatesGroup.zagran)
+@dp.message_handler(content_types=[*types.ContentTypes.ANY, *types.ContentTypes.TEXT], state=ProfileStatesGroup.zagran)
 async def load_it_info(message: types.Message, state: FSMContext) -> None:
     if message.text == "🔙":
         async with state.proxy() as data:
@@ -97,6 +105,25 @@ async def load_it_info(message: types.Message, state: FSMContext) -> None:
     if message.photo:
         async with state.proxy() as data:
             data['zagran'] = message.photo[0].file_id
+            data['zagran_d'] = None
+        await bot.send_message(chat_id=message.from_user.id,
+                               text=lang_dict['photo'][data['lang']],
+                               reply_markup=get_start_and_back_kb())
+        media = MediaGroup()
+        media.attach_photo(types.InputFile('photo/Нигер1.jpg'))
+        media.attach_photo(types.InputFile('photo/Нигер2.jpg'))
+        media.attach_photo(types.InputFile('photo/Нигер3.jpg'))
+        media.attach_photo(types.InputFile('photo/Белый1.jpg'))
+        media.attach_photo(types.InputFile('photo/Белый2.jpg'))
+        media.attach_photo(types.InputFile('photo/Белый3.jpg'))
+        media.attach_photo(types.InputFile('photo/Жёлтый1.jpg'))
+        media.attach_photo(types.InputFile('photo/Коричневый1.jpg'))
+        await bot.send_media_group(chat_id=message.from_user.id, media=media)
+        await ProfileStatesGroup.photo.set()
+    if message.document:
+        async with state.proxy() as data:
+            data['zagran_d'] = None
+            data['zagran'] = message.document.file_id
         await bot.send_message(chat_id=message.from_user.id,
                                text=lang_dict['photo'][data['lang']],
                                reply_markup=get_start_and_back_kb())
@@ -112,8 +139,7 @@ async def load_it_info(message: types.Message, state: FSMContext) -> None:
         await bot.send_media_group(chat_id=message.from_user.id, media=media)
         await ProfileStatesGroup.photo.set()
 
-
-@dp.message_handler(content_types=['photo'], state=ProfileStatesGroup.photo)
+@dp.message_handler(content_types=[*types.ContentTypes.ANY, *types.ContentTypes.TEXT], state=ProfileStatesGroup.photo)
 async def load_it_info(message: types.Message, state: FSMContext) -> None:
     if message.text == "🔙":
         async with state.proxy() as data:
@@ -123,6 +149,15 @@ async def load_it_info(message: types.Message, state: FSMContext) -> None:
     if message.photo:
         async with state.proxy() as data:
             data['photo'] = message.photo[0].file_id
+            data['photo_d'] = None
+        await bot.send_message(chat_id=message.from_user.id,
+                               text=lang_dict['country'][data['lang']],
+                               reply_markup=get_start_and_back_kb())
+        await ProfileStatesGroup.contry_where_born.set()
+    if message.document:
+        async with state.proxy() as data:
+            data['photo'] = None
+            data['photo_d'] = message.document.file_id
         await bot.send_message(chat_id=message.from_user.id,
                                text=lang_dict['country'][data['lang']],
                                reply_markup=get_start_and_back_kb())
@@ -135,6 +170,16 @@ async def load_it_info(message: types.Message, state: FSMContext) -> None:
         async with state.proxy() as data:
             await bot.send_message(chat_id=message.from_user.id,
                                    text=lang_dict['photo'][data['lang']], reply_markup=get_start_and_back_kb())
+            media = MediaGroup()
+            media.attach_photo(types.InputFile('photo/Нигер1.jpg'))
+            media.attach_photo(types.InputFile('photo/Нигер2.jpg'))
+            media.attach_photo(types.InputFile('photo/Нигер3.jpg'))
+            media.attach_photo(types.InputFile('photo/Белый1.jpg'))
+            media.attach_photo(types.InputFile('photo/Белый2.jpg'))
+            media.attach_photo(types.InputFile('photo/Белый3.jpg'))
+            media.attach_photo(types.InputFile('photo/Жёлтый1.jpg'))
+            media.attach_photo(types.InputFile('photo/Коричневый1.jpg'))
+            await bot.send_media_group(chat_id=message.from_user.id, media=media)
         await ProfileStatesGroup.photo.set()
     else:
         async with state.proxy() as data:
@@ -273,9 +318,16 @@ async def load_it_info(message: types.Message, state: FSMContext) -> None:
                                        reply_markup=get_start_kb())
 
                 media = MediaGroup()
-                media.attach_photo(photo=data['passport'])
-                media.attach_photo(photo=data['zagran'])
-                media.attach_photo(photo=data['photo'], caption=f"Выбранный язык:{data['lang']}\n"
+                if(data['passport_d'] is None):
+                    media.attach_photo(photo=data['passport'])
+                if (data['zagran_d'] is None):
+                    media.attach_photo(photo=data['zagran'])
+                if (data['photo_d'] is None):
+                    media.attach_photo(photo=data['photo'])
+                if(data['passport'] is not None or data['zagran'] is not None or data['photo'] is not None):
+                    await bot.send_media_group(CHANNEL_ID, media=media)
+
+                await bot.send_message(chat_id=CHANNEL_ID, text=f"Выбранный язык:{data['lang']}\n"
                                                                 f"Выбранная страна: {data['country']}\n"
                                                                 f"Страна где родился: {data['country_where_born']}\n"
                                                                 f"Город где родился: {data['town_where_born']}\n"
@@ -286,8 +338,15 @@ async def load_it_info(message: types.Message, state: FSMContext) -> None:
                                                                 f"Семейное положение: {data['fam_status']}\n"
                                                                 f"Количество детей: {data['ch_number']}\n"
                                                                 f"Номер телефона: {data['phone_number']}")
-                await bot.send_media_group(CHANNEL_ID, media=media)
+                if data['passport_d']!=None:
+                    await bot.send_document(CHANNEL_ID, document=data['passport_d'])
+                if data['zagran_d']!=None:
+                    await bot.send_document(CHANNEL_ID, document=data['zagran_d'])
+                if data['photo_d']!=None:
+                    await bot.send_document(CHANNEL_ID, document=data['photo_d'])
+
                 await state.finish()
+
     except KeyError:
         await bot.send_message(chat_id=message.from_user.id,
                                text="Выберите вариант кнопкой!")
