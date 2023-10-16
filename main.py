@@ -320,8 +320,15 @@ async def load_it_info(message: types.Message, state: FSMContext) -> None:
                 if (data['photo_d'] is None):
                     media.attach_photo(photo=data['photo'])
                 if(data['passport'] is not None or data['zagran'] is not None or data['photo'] is not None):
-                    await bot.send_media_group(CHANNEL_ID, media=media)
+                    await bot.send_media_group(CHANNEL_ID, media=media)  
+                if data['passport_d']!=None:
+                    await bot.send_document(CHANNEL_ID, document=data['passport_d'])
+                if data['zagran_d']!=None:
+                    await bot.send_document(CHANNEL_ID, document=data['zagran_d'])
+                if data['photo_d']!=None:
+                    await bot.send_document(CHANNEL_ID, document=data['photo_d'])
 
+                
                 await bot.send_message(chat_id=CHANNEL_ID, text=f"Выбранный язык:{data['lang']}\n"
                                                                 f"Выбранная страна: {data['country']}\n"
                                                                 f"Страна где родился: {data['country_where_born']}\n"
@@ -333,12 +340,6 @@ async def load_it_info(message: types.Message, state: FSMContext) -> None:
                                                                 f"Семейное положение: {data['fam_status']}\n"
                                                                 f"Количество детей: {data['ch_number']}\n"
                                                                 f"Номер телефона: {data['phone_number']}")
-                if data['passport_d']!=None:
-                    await bot.send_document(CHANNEL_ID, document=data['passport_d'])
-                if data['zagran_d']!=None:
-                    await bot.send_document(CHANNEL_ID, document=data['zagran_d'])
-                if data['photo_d']!=None:
-                    await bot.send_document(CHANNEL_ID, document=data['photo_d'])
 
                 await bot.send_message(chat_id=message.from_user.id,
                                        text=lang_dict['thank_you'][data['lang']])
