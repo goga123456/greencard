@@ -1,3 +1,4 @@
-web: python main.py
+worker: python -m aiogram.dispatcher --workers 2
+
 
 
