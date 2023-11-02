@@ -1,4 +1,4 @@
-worker: python -m aiogram.dispatcher --workers 2
+worker: python main.py --workers 2
 
 
 
